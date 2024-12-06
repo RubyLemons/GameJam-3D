@@ -1,0 +1,108 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using TMPro;
+using Unity.Burst.CompilerServices;
+using Unity.VisualScripting;
+
+public class Gun : MonoBehaviour
+{
+
+    [SerializeField] Freelook freelook;
+
+    [SerializeField] Animator animator;
+    public bool reloadAction;
+
+    [Space(10)]
+
+    //[SerializeField] static int[] ammo = new int[] { 6, 36 };
+
+    [SerializeField] TextMeshProUGUI ammoLabel;
+
+    [SerializeField] GameObject bulletScar;
+    [SerializeField] LayerMask layers;
+
+    //[SerializeField] GameObject ammoOutter;
+    //[SerializeField] GameObject ammoInner;
+
+    bool deb;
+    [SerializeField] float reloadTime = 0.375f;
+    float elaspedTime;
+
+    void Update()
+    {
+        //clamp amuncation pool
+        ammo[0] = Mathf.Clamp(ammo[0], 0, 6);
+        ammo[1] = Mathf.Clamp(ammo[1], 0, 108);
+
+        //Fire
+
+        elaspedTime += Time.deltaTime;
+        deb = (elaspedTime < reloadTime);
+
+        if (!deb && !reloadAction && Input.GetMouseButton(0) && ammo[0] > 0)
+        {
+            elaspedTime = 0;
+
+            animator.Play("Fire", 0, 0.0f);
+            Fire();//LAZZY
+            animator.SetFloat("Reload Speed", ((float)ammo[0] / 10) + 0.4f + 0.25f);
+        }
+
+        //Reload
+
+        reloadAction = animator.GetCurrentAnimatorStateInfo(0).IsName("Reload");
+
+        if (!deb && (Input.GetKeyDown(KeyCode.R) || Input.GetMouseButtonDown(0) && ammo[0] <= 0))
+        {
+            if (ammo[0] < 6 && ammo[1] > 0 && !reloadAction)
+            {
+                animator.Play("Reload");
+                Reload();//LAZZY
+            }
+        }
+
+        //ammo label
+        ammoLabel.text = $"{ammo[0]}/{ammo[1]}";
+
+        ////Ammo visuals
+
+        //for (int i = 0; i < ammoInner.transform.childCount; i++)
+        //{
+        //    GameObject shellInner = ammoInner.transform.GetChild(i).gameObject;
+        //    GameObject shellOutter = ammoOutter.transform.GetChild(i).gameObject;
+
+        //    shellInner.SetActive(false);
+        //    shellOutter.SetActive(true);
+
+        //    if (i < ammo[0])
+        //    {
+        //        shellInner.SetActive(true);
+        //        shellOutter.SetActive(false);
+        //    }
+        //}
+    }
+
+    public void Fire()
+    {
+        if (deb) return;
+        ammo[0] -= 1;
+
+        bool ray = Physics.Raycast(freelook.cam.transform.position, freelook.cam.transform.forward, out RaycastHit hit, 100, layers);
+
+        if (ray)
+        {
+            GameObject newBulletScar = Instantiate(bulletScar, null);
+            newBulletScar.SetActive(true);
+            newBulletScar.transform.localScale = Vector3.one * 0.00375f;
+
+            newBulletScar.transform.position = hit.point - (freelook.cam.transform.forward * 0.001f);
+            newBulletScar.transform.rotation = Quaternion.LookRotation(hit.normal) * Quaternion.Euler(Vector3.left * -90) * Quaternion.Euler(Vector3.up * Random.Range(0, 90));
+        }
+    }
+
+    //public void Reload()
+    //{
+        //ammo[0] = 6;
+    //}
+}

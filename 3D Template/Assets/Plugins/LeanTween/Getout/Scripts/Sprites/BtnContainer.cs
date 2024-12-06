@@ -23,6 +23,8 @@ public class BtnContainer : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 
     [SerializeField] bool animateWheel;
 
+    [SerializeField] float scale = 1.25f;
+
     bool deb;
 
     Vector3 goal;
@@ -58,6 +60,7 @@ public class BtnContainer : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         StartCoroutine(Tks.SetTimeout(() => deb = false, 100));
 
         img.color = colors[1];
+        raycastTarget.transform.localScale = Vector2.one * scale;
 
 
         if (!animateWheel) return;
@@ -71,6 +74,7 @@ public class BtnContainer : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         if (!animate) return;
 
         img.color = colors[0];
+        raycastTarget.transform.localScale = Vector2.one;
 
 
         if (!animateWheel) return;
