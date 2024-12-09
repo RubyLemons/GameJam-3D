@@ -17,6 +17,7 @@ public class Gun : MonoBehaviour
     [SerializeField] LayerMask layers;
 
     bool fireDeb;
+    bool reloadDeb;
 
     bool reloadAction;
 
@@ -28,6 +29,8 @@ public class Gun : MonoBehaviour
 
         AmmoClamp();
 
+        reloadAction = WeaponSelect.equpped.animator.GetCurrentAnimatorStateInfo(0).IsName("reload");
+
         //Fire
 
         elaspedTime += Time.deltaTime;
@@ -36,13 +39,8 @@ public class Gun : MonoBehaviour
         bool ammoFull = WeaponSelect.equpped.ammo == WeaponSelect.equpped.ammoLimit;
         bool ammoEmpty = WeaponSelect.equpped.ammo <= 0;
 
-        if (!fireDeb && !reloadAction && Input.GetMouseButton(0))
+        if (!fireDeb && !reloadAction && Input.GetMouseButton(0) && !ammoEmpty)
         {
-            if (ammoEmpty) {
-                Reload();
-                return;
-            }
-
             elaspedTime = 0;
 
             for (int i = 0; i < WeaponSelect.equpped.bullets; i++) {
@@ -50,11 +48,16 @@ public class Gun : MonoBehaviour
             }
         }
 
+        if (Input.GetMouseButtonDown(0) && !reloadAction && ammoEmpty)
+        {
+            Reload();
+        }
+
         //Reload
 
-        reloadAction = WeaponSelect.equpped.animator.GetCurrentAnimatorStateInfo(0).IsName("reload");
+        if (Input.GetKeyDown(KeyCode.R) && !reloadAction) {
+            if (ammoFull) return;
 
-        if (Input.GetKeyDown(KeyCode.R) && !ammoFull) {
             Reload();
         }
 
@@ -71,11 +74,12 @@ public class Gun : MonoBehaviour
 
     public void Fire()
     {
-        Recoil();
 
         WeaponSelect.equpped.animator.Play("fire", 0, 0.0f);
         camShake.Play("shake", 0, 0.0f);
         WeaponSelect.equpped.ammo -= 1;
+
+        freelook.animatedRecoil.transform.localRotation *= Quaternion.Euler(Vector3.left * WeaponSelect.equpped.recoil / WeaponSelect.equpped.bullets);
 
         Vector3 spread = (freelook.cam.transform.right * Random.Range(-WeaponSelect.equpped.spread, WeaponSelect.equpped.spread)) + (freelook.cam.transform.up * Random.Range(-WeaponSelect.equpped.spread, WeaponSelect.equpped.spread));
         bool ray = Physics.Raycast(freelook.cam.transform.position, freelook.cam.transform.forward + spread, out RaycastHit hit, 100, layers);
@@ -95,20 +99,20 @@ public class Gun : MonoBehaviour
         newBulletScar.transform.rotation = Quaternion.LookRotation(_hit.normal) * Quaternion.Euler(Vector3.left * -90) * Quaternion.Euler(Vector3.up * Random.Range(0, 90));
     }
 
-    void Recoil()
-    {
-        freelook.animatedRecoil.transform.localRotation *= Quaternion.Euler(Vector3.left * WeaponSelect.equpped.recoil / WeaponSelect.equpped.bullets);
-    }
 
     void Reload()
     {
-        if (reloadAction) return;
+        if (reloadDeb) return;
+        reloadDeb = true;
+
 
         WeaponSelect.equpped.animator.Play("reload");
 
         float sleep = WeaponSelect.equpped.reloadTime * 1000;
 
-        StartCoroutine(Tks.SetTimeout(() =>
-            WeaponSelect.equpped.ammo = WeaponSelect.equpped.ammoLimit, sleep));
+        StartCoroutine(Tks.SetTimeout(() => {
+            WeaponSelect.equpped.ammo = WeaponSelect.equpped.ammoLimit;
+            reloadDeb = false;
+        }, sleep));
     }
 }

@@ -25,6 +25,8 @@ public class Freeroam : MonoBehaviour
     [SerializeField] float fovRun = 10f;
     [SerializeField] float fovSmooth = 0.2f;
 
+    float movementBlend;
+
     [Header("Slide Movement")]
 
     [SerializeField] float targetSlideForce = 22.5f;
@@ -78,6 +80,12 @@ public class Freeroam : MonoBehaviour
         freelook.cam.fieldOfView = Mathf.Lerp(freelook.cam.fieldOfView, initialFov + (fast || slideDeb ? fovRun : 0), fovSmooth);
 
         fast = (Input.GetKey(KeyCode.LeftShift) && moving && !backwards);
+
+        //aniamte vm
+
+        movementBlend = Mathf.Lerp(movementBlend, (fast && ground) ? 1 : 0, 0.45f);
+
+        WeaponSelect.equpped.animator.SetFloat("movement", movementBlend);
     }
 
 
