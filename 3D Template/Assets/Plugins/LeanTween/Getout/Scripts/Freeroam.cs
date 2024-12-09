@@ -113,7 +113,7 @@ public class Freeroam : MonoBehaviour
             slideForce = targetSlideForce;
 
             LeanTween.moveLocal(freelook.cam.gameObject, Vector3.up * dropHeight, animSpeed).setEaseOutCubic(); ;
-            LeanTween.rotateLocal(freelook.animatedCam.gameObject, Vector3.forward * slideTilt, animSpeed).setEaseOutCubic();
+            LeanTween.rotateLocal(freelook.animatedSlide.gameObject, Vector3.forward * slideTilt, animSpeed).setEaseOutCubic();
 
             StartCoroutine(Tks.SetTimeout(() => {
                 StopSlide();
@@ -131,7 +131,7 @@ public class Freeroam : MonoBehaviour
         slideDeb = false;
 
         LeanTween.moveLocal(freelook.cam.gameObject, Vector3.up * 0.75f, animSpeed).setEaseOutCubic(); ; //COMEBACK
-        LeanTween.rotateLocal(freelook.animatedCam.gameObject, Vector3.zero, animSpeed).setEaseOutCubic();
+        LeanTween.rotateLocal(freelook.animatedSlide.gameObject, Vector3.zero, animSpeed).setEaseOutCubic();
     }
 
     Vector3 Gravity()

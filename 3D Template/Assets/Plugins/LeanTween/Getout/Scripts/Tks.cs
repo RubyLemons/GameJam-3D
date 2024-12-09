@@ -39,6 +39,10 @@ public class Tks
         public Sprite ico;
         public bool enabled;
 
+        [Space(10)]
+
+        public Animator animator;
+
         [Header("Fire")]
 
         [Range(0, 1)] public float spread = 0.1f;
@@ -53,7 +57,7 @@ public class Tks
 
         [Header("Ammunation")]
 
-        [Range(0, 999)] public int[] ammo = new int[2];
-        [Range(0, 999)] public int[] ammoLimit = new int[2];
+        public int ammo;
+        [Range(0, 999)] public int ammoLimit;
     }
 }

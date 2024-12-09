@@ -36,6 +36,6 @@ public class Freelook : MonoBehaviour
         Quaternion animatedRecoilRot = Quaternion.Euler(animatedRecoil.localRotation.eulerAngles.x, animatedRecoil.localRotation.eulerAngles.y, animatedRecoil.localRotation.eulerAngles.z);
         Quaternion animatedSlideRot = Quaternion.Euler(animatedRecoil.localRotation.eulerAngles.x, animatedRecoil.localRotation.eulerAngles.y, animatedRecoil.localRotation.eulerAngles.z);
 
-        cam.transform.localRotation = Quaternion.Euler(Vector3.left * (mouseDelta.y)) * animatedCamRot * animatedRecoilRot;
+        cam.transform.localRotation = Quaternion.Euler(Vector3.left * (mouseDelta.y)) * animatedCamRot * animatedRecoilRot * animatedSlideRot;
     }
 }

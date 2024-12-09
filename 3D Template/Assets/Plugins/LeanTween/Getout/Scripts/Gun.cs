@@ -7,10 +7,7 @@ public class Gun : MonoBehaviour
 {
     
     [SerializeField] Freelook freelook;
-
-    [Space(10)]
-
-    [SerializeField] Animator animator;
+    [SerializeField] Animator camShake;
 
     [Space(10)]
 
@@ -20,7 +17,6 @@ public class Gun : MonoBehaviour
     [SerializeField] LayerMask layers;
 
     bool fireDeb;
-    bool reloadDeb;
 
     bool reloadAction;
 
@@ -36,10 +32,9 @@ public class Gun : MonoBehaviour
 
         elaspedTime += Time.deltaTime;
         fireDeb = (elaspedTime < WeaponSelect.equpped.fireRate);
-        reloadDeb = (elaspedTime < WeaponSelect.equpped.reloadTime);
 
-        bool ammoFull = WeaponSelect.equpped.ammo[0] == WeaponSelect.equpped.ammoLimit[0];
-        bool ammoEmpty = WeaponSelect.equpped.ammo[0] <= 0;
+        bool ammoFull = WeaponSelect.equpped.ammo == WeaponSelect.equpped.ammoLimit;
+        bool ammoEmpty = WeaponSelect.equpped.ammo <= 0;
 
         if (!fireDeb && !reloadAction && Input.GetMouseButton(0))
         {
@@ -57,7 +52,7 @@ public class Gun : MonoBehaviour
 
         //Reload
 
-        reloadAction = animator.GetCurrentAnimatorStateInfo(0).IsName("Reload");
+        reloadAction = WeaponSelect.equpped.animator.GetCurrentAnimatorStateInfo(0).IsName("reload");
 
         if (Input.GetKeyDown(KeyCode.R) && !ammoFull) {
             Reload();
@@ -69,16 +64,18 @@ public class Gun : MonoBehaviour
 
     void AmmoClamp()
     {
-        WeaponSelect.equpped.ammo[0] = Mathf.Clamp(WeaponSelect.equpped.ammo[0], 0, WeaponSelect.equpped.ammoLimit[0]);
-        WeaponSelect.equpped.ammo[1] = Mathf.Clamp(WeaponSelect.equpped.ammo[1], 0, WeaponSelect.equpped.ammoLimit[1]);
+        WeaponSelect.equpped.ammo = Mathf.Clamp(WeaponSelect.equpped.ammo, 0, WeaponSelect.equpped.ammoLimit);
+
+        ammoLabel.text = WeaponSelect.equpped.ammo.ToString();
     }
 
     public void Fire()
     {
         Recoil();
 
-        animator.Play("Fire", 0, 0.0f);
-        WeaponSelect.equpped.ammo[0] -= 1;
+        WeaponSelect.equpped.animator.Play("fire", 0, 0.0f);
+        camShake.Play("shake", 0, 0.0f);
+        WeaponSelect.equpped.ammo -= 1;
 
         Vector3 spread = (freelook.cam.transform.right * Random.Range(-WeaponSelect.equpped.spread, WeaponSelect.equpped.spread)) + (freelook.cam.transform.up * Random.Range(-WeaponSelect.equpped.spread, WeaponSelect.equpped.spread));
         bool ray = Physics.Raycast(freelook.cam.transform.position, freelook.cam.transform.forward + spread, out RaycastHit hit, 100, layers);
@@ -105,21 +102,13 @@ public class Gun : MonoBehaviour
 
     void Reload()
     {
-        if (reloadDeb || reloadAction || WeaponSelect.equpped.ammo[1] <= 0) return;
+        if (reloadAction) return;
 
-        animator.Play("Reload");
+        WeaponSelect.equpped.animator.Play("reload");
 
-        StartCoroutine(Tks.SetTimeout(() => {
-            for (int i = 0; i < WeaponSelect.equpped.ammoLimit[0]; i++)
-            {
-                if (WeaponSelect.equpped.ammo[1] > 0)
-                {
-                    WeaponSelect.equpped.ammo[1] -= 1;
-                    WeaponSelect.equpped.ammo[0] += 1;
-                }
-            }
+        float sleep = WeaponSelect.equpped.reloadTime * 1000;
 
-            ammoLabel.text = WeaponSelect.equpped.ammo[1] + " - " + WeaponSelect.equpped.ammo[0];
-        }, WeaponSelect.equpped.reloadTime * 1000));
+        StartCoroutine(Tks.SetTimeout(() =>
+            WeaponSelect.equpped.ammo = WeaponSelect.equpped.ammoLimit, sleep));
     }
 }
