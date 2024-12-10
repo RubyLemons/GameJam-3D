@@ -6,6 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Plugins/LeanTween/Getout/Scripts/SampleScene.unity
+    path: Assets/Plugins/LeanTween/Getout/Scripts/Level.unity
     guid: 172a65786a877274ebe7479809e17f67
   m_configObjects: {}

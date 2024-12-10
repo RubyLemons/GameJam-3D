@@ -63,7 +63,7 @@ public class Combo : MonoBehaviour
         AnimateGui();
 
         //debug
-        if (Input.GetKeyDown(KeyCode.C))
+        if (Input.GetKeyDown(KeyCode.F))
             points += 0.05f;
     }
 

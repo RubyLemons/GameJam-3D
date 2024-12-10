@@ -6,8 +6,9 @@ public class EnemySpawning : MonoBehaviour
 {
     [SerializeField] Freelook freelook;
 
-    [SerializeField] Transform points;
+    [Header("Spawning")]
 
+    [SerializeField] Transform points;
     [SerializeField] GameObject enemy;
 
     void Update()
@@ -18,12 +19,16 @@ public class EnemySpawning : MonoBehaviour
 
     void ProduceEnemy()
     {
+        //produce
         Transform spawnPoint = points.GetChild(Random.Range(0, points.childCount - 1));
 
         GameObject newEnemy = Instantiate(enemy);
         newEnemy.SetActive(false);
 
-        //release enemy
+        //position
+        newEnemy.transform.position = spawnPoint.position;
+
+        //release
         StartCoroutine(WaitFor(() => newEnemy.SetActive(true), spawnPoint));
     }
 
@@ -35,9 +40,9 @@ public class EnemySpawning : MonoBehaviour
         return (dotProduct > 0);
     }
 
-    IEnumerator WaitFor(System.Action action, Transform target)
+    IEnumerator WaitFor(System.Action action, Transform point)
     {
-        while (!NotFacing(target)) {
+        while (!NotFacing(point)) {
             yield return null;
         }
 

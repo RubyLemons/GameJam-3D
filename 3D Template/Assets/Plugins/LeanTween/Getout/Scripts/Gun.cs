@@ -87,13 +87,30 @@ public class Gun : MonoBehaviour
 
         camAnimated.transform.localRotation *= Quaternion.Euler(Vector3.left * WeaponSelect.equpped.recoil / WeaponSelect.equpped.bullets);
 
-        //raycast
+
+        //Raycast
 
         Vector3 spread = (freelook.cam.transform.right * Random.Range((float)-WeaponSelect.equpped.spread, WeaponSelect.equpped.spread)) + (freelook.cam.transform.up * Random.Range((float)-WeaponSelect.equpped.spread, WeaponSelect.equpped.spread));
         bool ray = Physics.Raycast(freelook.cam.transform.position, freelook.cam.transform.forward + spread, out RaycastHit hit, 100, layers);
 
-        if (ray) {
-            BulletScar(hit);
+
+        //Attack
+
+        if (ray)
+        {
+            Enemy enemy = hit.collider.GetComponent<Enemy>();
+
+            bool head = (enemy == null && hit.collider.tag == "Enemy");
+            enemy = (head) ? hit.collider.transform.parent.GetComponent<Enemy>() : enemy;
+
+            if (enemy)
+            {
+                enemy.health -= WeaponSelect.equpped.damage * ((head) ? 2 : 1);
+            }
+            else
+            {
+                BulletScar(hit);
+            }
         }
     }
 

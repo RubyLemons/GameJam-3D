@@ -46,6 +46,10 @@ public class Tks
 
         [Header("Fire")]
 
+        [Range(0, 1)] public float damage = 0.01f;
+
+        [Space(10)]
+
         [Range(0, 1)] public float spread = 0.1f;
         [Range(0, 90)] public float recoil = 5;
         [Range(0, 1)] public float recoilSmooth = 0.025f;

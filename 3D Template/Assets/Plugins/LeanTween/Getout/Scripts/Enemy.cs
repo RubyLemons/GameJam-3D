@@ -5,30 +5,74 @@ using UnityEngine.AI;
 
 public class Enemy : MonoBehaviour
 {
+    [Header("Enemy")]
+
     [SerializeField] NavMeshAgent agent;
+    float initialSpeed;
 
-    Transform dest;
+    [Range(0, 1)] public float health = 1;
 
-    bool closeRange;
+
+    Transform plr;
+
+    [Header("Attack")]
+
+    [Range(0, 1)] [SerializeField] float damage = 0.25f;
+
+    [Space(10)]
+
+    [SerializeField] float attackRange = 1f;
+    float range;
+    bool inRange;
+
+    [SerializeField] float attackTime = 0.15f;
+    [SerializeField] float attackSleepTime = 0.25f;
+    bool attackDeb;
 
     void Awake()
     {
-        dest = GameObject.Find("PLAYER").transform;
+        initialSpeed = agent.speed;
+
+        plr = GameObject.Find("PLAYER").transform;
     }
 
     void Update()
     {
-        closeRange = (transform.position - dest.position).magnitude < 5;
+        health = Mathf.Clamp01(health);
 
-        if (!closeRange)
-        {
-            agent.SetDestination(dest.position);
+        range = (transform.position - plr.position).magnitude;
+        inRange = (range < attackRange);
 
-            agent.isStopped = false;
+        //Follow
+
+        agent.SetDestination(plr.position);
+        agent.isStopped = inRange;
+
+        agent.speed = (attackDeb) ? initialSpeed : initialSpeed / 2;
+
+
+        //Attack
+
+        if (!attackDeb) {
+            attackDeb = true;
+
+            //PLAY();
+
+            StartCoroutine(Tks.SetTimeout(() =>
+            {
+                if (inRange) {
+                    Health.health -= damage;
+                }
+            }, attackTime * 1000));
+
+            //deb
+            StartCoroutine(Tks.SetTimeout(() => attackDeb = false, attackSleepTime * 1000));
         }
-        else
-        {
-            agent.isStopped = true;
+
+        //DEBUG
+        if (health <= 0) {
+            gameObject.SetActive(false);
+            health = 1;
         }
     }
 }

@@ -63,10 +63,6 @@ public class Health : MonoBehaviour
         }, health, "Health");
 
         AnimateGui();
-
-        //debug
-        if (Input.GetKeyDown(KeyCode.F))
-            health -= 0.1f;
     }
 
     void AnimateGui()
