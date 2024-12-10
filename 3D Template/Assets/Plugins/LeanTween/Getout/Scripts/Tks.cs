@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Tks
 {
@@ -59,5 +60,58 @@ public class Tks
 
         public int ammo;
         [Range(0, 999)] public int ammoLimit;
+    }
+
+    //run everyframe
+    static Dictionary<Image, bool> flickerDebFlags = new Dictionary<Image, bool>();
+
+    public static IEnumerator FlickerImg(Image img, float timeout = 50)
+    {
+        if (!flickerDebFlags.ContainsKey(img))
+            flickerDebFlags.Add(img, false);
+
+        if (flickerDebFlags[img]) yield break;
+        flickerDebFlags[img] = true;
+
+        img.gameObject.SetActive(false);
+        yield return new WaitForSeconds(timeout / 1000);
+        img.gameObject.SetActive(true);
+        yield return new WaitForSeconds(timeout / 1000);
+
+        flickerDebFlags[img] = false;
+    }
+
+
+    //neg or pos
+
+    public static int GetRandomSign()
+    {
+        int random = Random.Range(0, 2);
+
+        int result = (random == 0) ? 1 : -1;
+
+        return result;
+    }
+
+    //Changed listener (once only)
+
+    static Dictionary<string, float> current = new Dictionary<string, float>();
+    static Dictionary<string, float> late = new Dictionary<string, float>();
+
+    public static void OnValueChanged(System.Action<bool> action, float real, string key)
+    {
+        if (!current.ContainsKey(key))
+        {
+            current.Add(key, 0);
+            late.Add(key, 0);
+        }
+
+        current[key] = real;
+
+        if (current[key] != late[key])
+            action.Invoke(current[key] > late[key]);
+
+
+        late[key] = real;
     }
 }

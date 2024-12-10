@@ -7,6 +7,8 @@ public class Gun : MonoBehaviour
 {
     
     [SerializeField] Freelook freelook;
+
+    [SerializeField] Transform camAnimated;
     [SerializeField] Animator camShake;
 
     [Space(10)]
@@ -16,12 +18,19 @@ public class Gun : MonoBehaviour
     [SerializeField] GameObject bulletScar;
     [SerializeField] LayerMask layers;
 
+    float elaspedTime;
+
+    [Space(10)]
+
+    bool ammoFull;
+    bool ammoEmpty;
+
+
     bool fireDeb;
     bool reloadDeb;
 
+    bool fireAction;
     bool reloadAction;
-
-    float elaspedTime;
 
     void Update()
     {
@@ -30,39 +39,34 @@ public class Gun : MonoBehaviour
         AmmoClamp();
 
         reloadAction = WeaponSelect.equpped.animator.GetCurrentAnimatorStateInfo(0).IsName("reload");
+        fireAction = WeaponSelect.equpped.animator.GetCurrentAnimatorStateInfo(0).IsName("fire");
 
         //Fire
 
         elaspedTime += Time.deltaTime;
         fireDeb = (elaspedTime < WeaponSelect.equpped.fireRate);
 
-        bool ammoFull = WeaponSelect.equpped.ammo == WeaponSelect.equpped.ammoLimit;
-        bool ammoEmpty = WeaponSelect.equpped.ammo <= 0;
+        ammoFull = WeaponSelect.equpped.ammo == WeaponSelect.equpped.ammoLimit;
+        ammoEmpty = WeaponSelect.equpped.ammo <= 0;
 
-        if (!fireDeb && !reloadAction && Input.GetMouseButton(0) && !ammoEmpty)
-        {
+        if (Input.GetMouseButton(0) && !ammoEmpty && (!fireDeb && !reloadAction)) {
+
             elaspedTime = 0;
 
-            for (int i = 0; i < WeaponSelect.equpped.bullets; i++) {
+            for (int i = 0; i < WeaponSelect.equpped.bullets; i++)
                 Fire();
-            }
         }
 
-        if (Input.GetMouseButtonDown(0) && !reloadAction && ammoEmpty)
-        {
+        if (Input.GetMouseButtonDown(0) && ammoEmpty)
             Reload();
-        }
 
         //Reload
 
-        if (Input.GetKeyDown(KeyCode.R) && !reloadAction) {
-            if (ammoFull) return;
-
+        if (Input.GetKeyDown(KeyCode.R))
             Reload();
-        }
 
-        //recoil animated
-        freelook.animatedRecoil.localRotation = Quaternion.Lerp(freelook.animatedRecoil.localRotation, Quaternion.identity, WeaponSelect.equpped.recoilSmooth);
+        //cam animated recoil
+        camAnimated.localRotation = Quaternion.Lerp(camAnimated.localRotation, Quaternion.identity, WeaponSelect.equpped.recoilSmooth);
     }
 
     void AmmoClamp()
@@ -74,14 +78,18 @@ public class Gun : MonoBehaviour
 
     public void Fire()
     {
+        //aniamte
 
         WeaponSelect.equpped.animator.Play("fire", 0, 0.0f);
         camShake.Play("shake", 0, 0.0f);
+
         WeaponSelect.equpped.ammo -= 1;
 
-        freelook.animatedRecoil.transform.localRotation *= Quaternion.Euler(Vector3.left * WeaponSelect.equpped.recoil / WeaponSelect.equpped.bullets);
+        camAnimated.transform.localRotation *= Quaternion.Euler(Vector3.left * WeaponSelect.equpped.recoil / WeaponSelect.equpped.bullets);
 
-        Vector3 spread = (freelook.cam.transform.right * Random.Range(-WeaponSelect.equpped.spread, WeaponSelect.equpped.spread)) + (freelook.cam.transform.up * Random.Range(-WeaponSelect.equpped.spread, WeaponSelect.equpped.spread));
+        //raycast
+
+        Vector3 spread = (freelook.cam.transform.right * Random.Range((float)-WeaponSelect.equpped.spread, WeaponSelect.equpped.spread)) + (freelook.cam.transform.up * Random.Range((float)-WeaponSelect.equpped.spread, WeaponSelect.equpped.spread));
         bool ray = Physics.Raycast(freelook.cam.transform.position, freelook.cam.transform.forward + spread, out RaycastHit hit, 100, layers);
 
         if (ray) {
@@ -102,9 +110,8 @@ public class Gun : MonoBehaviour
 
     void Reload()
     {
-        if (reloadDeb) return;
+        if (reloadDeb || reloadAction || fireAction || ammoFull) return;
         reloadDeb = true;
-
 
         WeaponSelect.equpped.animator.Play("reload");
 

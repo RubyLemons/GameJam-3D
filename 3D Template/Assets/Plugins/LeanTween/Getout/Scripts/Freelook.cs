@@ -5,9 +5,8 @@ using UnityEngine;
 public class Freelook : MonoBehaviour
 {
     public Camera cam;
-    public Transform animatedCam;
-    public Transform animatedSlide;
-    public Transform animatedRecoil;
+
+    [SerializeField] Transform[] animatedCams;
 
     [HideInInspector] public Vector2 mouseDelta;
     [SerializeField] float sens = 1;
@@ -32,10 +31,16 @@ public class Freelook : MonoBehaviour
 
         transform.rotation = Quaternion.Euler(Vector3.up * (mouseDelta.x));
 
-        Quaternion animatedCamRot = Quaternion.Euler(animatedCam.localRotation.eulerAngles.x, animatedCam.localRotation.eulerAngles.y, animatedCam.localRotation.eulerAngles.z);
-        Quaternion animatedRecoilRot = Quaternion.Euler(animatedRecoil.localRotation.eulerAngles.x, animatedRecoil.localRotation.eulerAngles.y, animatedRecoil.localRotation.eulerAngles.z);
-        Quaternion animatedSlideRot = Quaternion.Euler(animatedRecoil.localRotation.eulerAngles.x, animatedRecoil.localRotation.eulerAngles.y, animatedRecoil.localRotation.eulerAngles.z);
+        cam.transform.localRotation = Quaternion.Euler(Vector3.left * (mouseDelta.y)) * AnimatedCameras();
+    }
 
-        cam.transform.localRotation = Quaternion.Euler(Vector3.left * (mouseDelta.y)) * animatedCamRot * animatedRecoilRot * animatedSlideRot;
+    Quaternion AnimatedCameras()
+    {
+        Vector3 product = Vector3.zero;
+
+        for (int i = 0; i < animatedCams.Length; i++)
+            product += animatedCams[i].localRotation.eulerAngles;
+
+        return Quaternion.Euler(product);
     }
 }
