@@ -14,6 +14,7 @@ public class Enemy : MonoBehaviour
 
 
     Transform plr;
+    Health plrHealth;
 
     [Header("Attack")]
 
@@ -34,6 +35,7 @@ public class Enemy : MonoBehaviour
         initialSpeed = agent.speed;
 
         plr = GameObject.Find("PLAYER").transform;
+        plrHealth = plr.GetComponent<Health>();
     }
 
     void Update()
@@ -61,7 +63,7 @@ public class Enemy : MonoBehaviour
             StartCoroutine(Tks.SetTimeout(() =>
             {
                 if (inRange) {
-                    Health.health -= damage;
+                    plrHealth.value -= damage;
                 }
             }, attackTime * 1000));
 

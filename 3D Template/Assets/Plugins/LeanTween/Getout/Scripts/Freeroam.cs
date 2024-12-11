@@ -30,13 +30,15 @@ public class Freeroam : MonoBehaviour
 
     [Header("Slide Movement")]
 
-    [SerializeField] float targetSlideForce = 22.5f;
+    [SerializeField] float targetSlideForce = 0.5f;
+    [SerializeField] float stopSlideAt = 0.01f;
     float slideForce;
 
-    [SerializeField][Range(0, 1)] float slideSmooth = 0.1f;
+    [SerializeField][Range(0, 1)] float slideSmooth = 0.05f;
 
     bool slideDeb;
-    [SerializeField] float slideTime = 475;
+
+    Vector3 slideDir;
 
     [Space(10)]
 
@@ -73,7 +75,7 @@ public class Freeroam : MonoBehaviour
         RaycastHit hit;
         ground = Physics.BoxCast(transform.position, new Vector3(controller.radius - 0.1f, controller.radius / 2, controller.radius - 0.1f), Vector3.down, out hit, Quaternion.identity, controller.height / 2);
 
-        if (Input.GetKeyDown(KeyCode.Space) && ground && Tks.freeroam)
+        if (Input.GetKeyDown(KeyCode.Space) && ground && Tks.freeroam && !slideDeb)
             velo = jumpHeight;
 
         //Fast
@@ -84,7 +86,7 @@ public class Freeroam : MonoBehaviour
 
         //aniamte vm
 
-        movementBlend = Mathf.Lerp(movementBlend, (fast && ground) ? 1 : 0, 0.45f);
+        movementBlend = Mathf.Lerp(movementBlend, (fast && ground && !slideDeb) ? 1 : 0, 0.45f);
 
         WeaponSelect.equpped.animator.SetFloat("movement", movementBlend);
     }
@@ -104,32 +106,34 @@ public class Freeroam : MonoBehaviour
         moveInput.y = (slideDeb) ? 0 : moveInput.y; //force move if sliding
         moveInput.x = (slideDeb) ? 0 : moveInput.x; //force move if sliding
 
-        Vector3 top = transform.forward * (moveInput.y * moveSpeed + slideForce) * Time.deltaTime;
-        Vector3 left = transform.right * (moveInput.x * moveSpeed) * Time.deltaTime;
 
-        return Tks.freeroam ? (top + left) : Vector3.zero;
+        Vector3 top = transform.forward * (moveInput.y * moveSpeed) * Time.deltaTime;
+        Vector3 left = transform.right * (moveInput.x * moveSpeed) * Time.deltaTime;
+        
+        Vector3 slideMovement = (slideDeb) ? (slideDir * slideForce) : Vector3.zero;
+
+        return Tks.freeroam ? (top + left) + slideMovement : Vector3.zero;
     }
 
     void SlideInput()
     {
-        if (!Tks.freeroam) return;
-
-        if (Input.GetKeyUp(KeyCode.C)) //COMEBACK
-            StopSlide();
+        if (!Tks.freeroam || !ground) return;
 
         if (Input.GetKeyDown(KeyCode.C) && !slideDeb && fast) {
             slideDeb = true;
+
+            slideDir = (transform.forward * moveInput.y) + (transform.right * moveInput.x);
             slideForce = targetSlideForce;
 
-            LeanTween.moveLocal(freelook.cam.gameObject, Vector3.up * dropHeight, animSpeed).setEaseOutCubic(); ;
-            LeanTween.rotateLocal(camAnimated.gameObject, Vector3.forward * slideTilt, animSpeed).setEaseOutCubic();
+            LeanTween.cancel(freelook.cam.gameObject);
+            LeanTween.cancel(camAnimated.gameObject);
 
-            StartCoroutine(Tks.SetTimeout(() => {
-                StopSlide();
-            }, slideTime));
+            int tiltRot = (moveInput.x > 0) ? 1 : -1;
+            LeanTween.moveLocal(freelook.cam.gameObject, Vector3.up * dropHeight, animSpeed).setEaseOutCubic();
+            LeanTween.rotateLocal(camAnimated.gameObject, Vector3.forward * slideTilt * tiltRot, animSpeed).setEaseOutCubic();
         }
 
-        if (slideForce < 0.01f) //COMEBACK
+        if (slideForce < stopSlideAt)
             StopSlide();
 
         slideForce = Mathf.Lerp(slideForce, 0, slideSmooth);
@@ -139,7 +143,10 @@ public class Freeroam : MonoBehaviour
     {
         slideDeb = false;
 
-        LeanTween.moveLocal(freelook.cam.gameObject, Vector3.up * 0.75f, animSpeed).setEaseOutCubic(); ; //COMEBACK
+        LeanTween.cancel(freelook.cam.gameObject);
+        LeanTween.cancel(camAnimated.gameObject);
+
+        LeanTween.moveLocal(freelook.cam.gameObject, Vector3.up * 0.75f, animSpeed).setEaseOutCubic(); //COMEBACK
         LeanTween.rotateLocal(camAnimated.gameObject, Vector3.zero, animSpeed).setEaseOutCubic();
     }
 

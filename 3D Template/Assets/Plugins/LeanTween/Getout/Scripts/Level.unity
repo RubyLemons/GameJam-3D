@@ -1241,7 +1241,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 13
+  m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &570907900
 GameObject:
@@ -2842,7 +2842,7 @@ Transform:
   - {fileID: 1786137809}
   - {fileID: 754989484}
   m_Father: {fileID: 0}
-  m_RootOrder: 14
+  m_RootOrder: 13
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &839898729
 GameObject:
@@ -2920,55 +2920,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 839898729}
   m_CullTransparentMesh: 1
---- !u!1 &859478232
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 859478234}
-  - component: {fileID: 859478233}
-  m_Layer: 0
-  m_Name: vol Default Setting Volume
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!114 &859478233
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 859478232}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IsGlobal: 1
-  priority: 0
-  blendDistance: 0
-  weight: 1
-  sharedProfile: {fileID: 11400000, guid: 2361b954d5a96b743a9a72b5b88ab576, type: 2}
---- !u!4 &859478234
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 859478232}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.6706419, y: -2.4433346, z: 13.039602}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 12
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &869891000
 GameObject:
   m_ObjectHideFlags: 0
@@ -10517,12 +10468,12 @@ MonoBehaviour:
   backwards: 0
   fovRun: 10
   fovSmooth: 0.2
-  targetSlideForce: 35
-  slideSmooth: 0.075
-  slideTime: 1000
+  targetSlideForce: 0.5
+  stopSlideAt: 0.01
+  slideSmooth: 0.05
   dropHeight: -0.375
   slideTilt: 10
-  animSpeed: 0.175
+  animSpeed: 0.1875
   gravityScale: 35
   jumpHeight: 7.375
   ground: 0
@@ -10538,13 +10489,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c14dd7a348a8ee43a3a00b275854608, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  decrease: 0.001
+  value: 0
+  change: -0.01
+  multiplierChange: 0.005
+  loopSleep: 0.1
   sleepTime: 3.75
+  baseKey: BaseCombo
   group: {fileID: 1769405659}
   fill: {fileID: 183489187}
   backdrop: {fileID: 1889882386}
   label: {fileID: 1206249608}
-  scalePop: 1
+  pop: 0.675
+  baseAnimOnDecrease: 0
 --- !u!114 &1524256009
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10557,14 +10513,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70223c7c66b6e724c81f525793400bce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  increase: 0.001
+  value: 1
+  change: 0.01
+  multiplierChange: 0.05
+  loopSleep: 0.05
   sleepTime: 3.75
+  baseKey: BaseHealth
   group: {fileID: 1138250305}
   fill: {fileID: 1393259076}
   backdrop: {fileID: 839898731}
+  label: {fileID: 252645991}
+  pop: 25
+  baseAnimOnDecrease: 1
   vignette: {fileID: 1683671751}
   camAnimated: {fileID: 785684539}
-  pop: 25
 --- !u!1 &1530636549
 GameObject:
   m_ObjectHideFlags: 0

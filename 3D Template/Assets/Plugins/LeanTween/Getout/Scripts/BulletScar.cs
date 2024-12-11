@@ -9,8 +9,8 @@ public class BulletScar : MonoBehaviour
         //animate
         StartCoroutine(Tks.SetTimeout(() =>
         {
-            LeanTween.scale(gameObject, Vector3.zero, 7.5f)
+            LeanTween.scale(gameObject, Vector3.zero, 1.0f)
             .setOnComplete(() => Destroy(gameObject));
-        }, 1000));
+        }, 7500));
     }
 }
